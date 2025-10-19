@@ -13,6 +13,10 @@ class LedController extends IApiController {
   final modes = <String>[].obs;
   final mode = Rx<String?>(null);
 
+  final brightness = 16.0.obs;
+  final speed = 256.0.obs;
+  final brightnessSpeedChangeInProgress = false.obs;
+
   Color nextColor = Colors.blue;
 
   LedController(super.apiProvider, this._lang);
@@ -30,32 +34,32 @@ class LedController extends IApiController {
 
   Future<void> onChangeColor() async {
     await onApiCallAction(
-      () async => apiProvider.changeColor(currentColor.value),
+      () async => await apiProvider.changeColor(currentColor.value),
     );
   }
 
   Future<void> onIncreaseBrightness() async {
-    await onApiCallAction(() async => apiProvider.increaseBrightness());
+    await onApiCallAction(apiProvider.increaseBrightness);
   }
 
   Future<void> onDecreaseBrightness() async {
-    await onApiCallAction(() async => apiProvider.decreaseBrightness());
+    await onApiCallAction(apiProvider.decreaseBrightness);
   }
 
   Future<void> onIncreaseSpeed() async {
-    await onApiCallAction(() async => apiProvider.increaseSpeed());
+    await onApiCallAction(apiProvider.increaseSpeed);
   }
 
   Future<void> onDecreaseSpeed() async {
-    await onApiCallAction(() => apiProvider.decreaseSpeed());
+    await onApiCallAction(apiProvider.decreaseSpeed);
   }
 
   Future<void> onAutoCyclePlay() async {
-    await onApiCallAction(() async => apiProvider.autoCyclePlay());
+    await onApiCallAction(apiProvider.autoCyclePlay);
   }
 
   Future<void> onAutoCycleStop() async {
-    await onApiCallAction(() async => apiProvider.autoCycleStop());
+    await onApiCallAction(apiProvider.autoCycleStop);
   }
 
   Future<void> onLoadModes() async {
@@ -79,7 +83,7 @@ class LedController extends IApiController {
       return;
     }
 
-    await onApiCallAction(() async => apiProvider.changeMode(index));
+    await onApiCallAction(() async => await apiProvider.changeMode(index));
   }
 
   Future<void> onSettings() async {
@@ -88,5 +92,37 @@ class LedController extends IApiController {
     if (forceRefresh) {
       await onLoadModes();
     }
+  }
+
+  Future<void> onBrightnessChange(double brightness) async {
+    if (brightnessSpeedChangeInProgress.isTrue) {
+      return;
+    }
+
+    brightnessSpeedChangeInProgress(true);
+
+    try {
+      await apiProvider.changeBrightness(brightness.toInt());
+    } finally {
+      brightnessSpeedChangeInProgress(false);
+    }
+
+    this.brightness(brightness);
+  }
+
+  Future<void> onSpeedChange(double speed) async {
+    if (brightnessSpeedChangeInProgress.isTrue) {
+      return;
+    }
+
+    brightnessSpeedChangeInProgress(true);
+
+    try {
+      await apiProvider.changeSpeed(speed.toInt());
+    } finally {
+      brightnessSpeedChangeInProgress(false);
+    }
+
+    this.speed(speed);
   }
 }

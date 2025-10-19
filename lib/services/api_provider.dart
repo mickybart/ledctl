@@ -36,12 +36,20 @@ class ApiProvider extends GetxService {
     await submitVal('b', '-');
   }
 
+  Future<void> changeBrightness(int value) async {
+    await submitVal('b', value.toString());
+  }
+
   Future<void> increaseSpeed() async {
     await submitVal('s', '+');
   }
 
   Future<void> decreaseSpeed() async {
     await submitVal('s', '-');
+  }
+
+  Future<void> changeSpeed(int value) async {
+    await submitVal('s', value.toString());
   }
 
   Future<void> autoCyclePlay() async {

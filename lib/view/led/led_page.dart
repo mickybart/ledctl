@@ -18,6 +18,8 @@ class LedPage extends GetView<LedController> {
     }
   }
 
+  final iconSize = 48.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +49,17 @@ class LedPage extends GetView<LedController> {
                   children: [
                     Obx(
                       () => ElevatedButton(
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(
+                            EdgeInsets.all(16.0),
+                          ),
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                ),
+                              ),
+                        ),
                         onPressed: () {
                           controller.updateNextColor(
                             controller.currentColor.value,
@@ -80,20 +93,13 @@ class LedPage extends GetView<LedController> {
                             textCancel: 'cancel'.tr,
                           );
                         },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 5.0,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(5.0),
-                              width: 90.0,
-                              height: 60.0,
-                              child: Container(
-                                color: controller.currentColor.value,
-                              ),
-                            ),
-                            Text("color".tr),
-                          ],
+                        child: Container(
+                          padding: EdgeInsets.all(5.0),
+                          width: 120.0,
+                          height: 100.0,
+                          child: Container(
+                            color: controller.currentColor.value,
+                          ),
                         ),
                       ),
                     ),
@@ -109,11 +115,33 @@ class LedPage extends GetView<LedController> {
                           },
                           icon: const Icon(Icons.brightness_low),
                           tooltip: 'decrease'.tr,
+                          iconSize: iconSize,
                         ),
                         Expanded(
-                          child: Text(
-                            'brightness'.tr,
-                            textAlign: TextAlign.center,
+                          child: Column(
+                            children: [
+                              Text(
+                                'brightness'.tr,
+                                textAlign: TextAlign.center,
+                              ),
+                              Slider(
+                                value: controller.brightness.value,
+                                onChanged: (value) async {
+                                  try {
+                                    print(value);
+                                    await controller.onBrightnessChange(value);
+                                  } catch (e) {
+                                    showSnackbarError(
+                                      'brightness'.tr,
+                                      e.toString(),
+                                    );
+                                  }
+                                },
+                                max: 255.0,
+                                min: 16.0,
+                                divisions: 15,
+                              ),
+                            ],
                           ),
                         ),
                         IconButton(
@@ -126,6 +154,7 @@ class LedPage extends GetView<LedController> {
                           },
                           icon: const Icon(Icons.brightness_high),
                           tooltip: 'increase'.tr,
+                          iconSize: iconSize,
                         ),
                       ],
                     ),
@@ -141,9 +170,28 @@ class LedPage extends GetView<LedController> {
                           },
                           icon: const Icon(Icons.arrow_circle_down),
                           tooltip: 'decrease'.tr,
+                          iconSize: iconSize,
                         ),
                         Expanded(
-                          child: Text('speed'.tr, textAlign: TextAlign.center),
+                          child: Column(
+                            children: [
+                              Text('speed'.tr, textAlign: TextAlign.center),
+                              Slider(
+                                value: controller.speed.value,
+                                onChanged: (value) async {
+                                  try {
+                                    print(value);
+                                    await controller.onSpeedChange(value);
+                                  } catch (e) {
+                                    showSnackbarError('speed'.tr, e.toString());
+                                  }
+                                },
+                                max: 4096.0, //65535.0,
+                                min: 256.0,
+                                divisions: 15,
+                              ),
+                            ],
+                          ),
                         ),
                         IconButton(
                           onPressed: () async {
@@ -155,6 +203,7 @@ class LedPage extends GetView<LedController> {
                           },
                           icon: const Icon(Icons.arrow_circle_up),
                           tooltip: 'increase'.tr,
+                          iconSize: iconSize,
                         ),
                       ],
                     ),
@@ -170,6 +219,7 @@ class LedPage extends GetView<LedController> {
                           },
                           icon: const Icon(Icons.stop),
                           tooltip: 'stop'.tr,
+                          iconSize: iconSize,
                         ),
                         Expanded(
                           child: Text(
@@ -187,6 +237,7 @@ class LedPage extends GetView<LedController> {
                           },
                           icon: const Icon(Icons.play_arrow),
                           tooltip: 'play'.tr,
+                          iconSize: iconSize,
                         ),
                       ],
                     ),
